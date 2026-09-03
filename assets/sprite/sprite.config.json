@@ -1,0 +1,25 @@
+{
+  "displayHeightPx": 150,
+  "states": {
+    "walk": {
+      "images": ["walk-1.png", "walk-2.png", "walk-3.png"],
+      "frameDurationMs": 150,
+      "loop": true
+    },
+    "idle": {
+      "images": ["idle-with-bottle.png"],
+      "frameDurationMs": 400,
+      "loop": false
+    },
+    "sip": {
+      "images": ["sip.png"],
+      "frameDurationMs": 500,
+      "loop": false
+    }
+  },
+  "walk": {
+    "distancePx": 220,
+    "durationMs": 1400,
+    "haltOffsetFromRightPx": 60
+  }
+}
