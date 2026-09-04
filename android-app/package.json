@@ -1,0 +1,23 @@
+{
+  "name": "water-reminder-android",
+  "version": "1.0.0",
+  "description": "Android companion app for the water reminder, built with Capacitor.",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "sync": "npm run build && npx cap sync android",
+    "open": "npx cap open android",
+    "run": "npm run sync && npx cap run android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/local-notifications": "^6.1.0",
+    "firebase": "^12.18.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2",
+    "esbuild": "^0.24.0"
+  }
+}

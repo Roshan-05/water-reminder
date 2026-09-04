@@ -1,0 +1,8 @@
+{
+  "appId": "com.roshankumarsah.waterreminder",
+  "appName": "Water Reminder",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}

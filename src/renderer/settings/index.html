@@ -2,6 +2,10 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -10,12 +14,36 @@
       Reminder interval (minutes)
       <input type="number" id="interval" min="1" />
     </label>
-    <label>
-      Snooze duration (minutes)
-      <input type="number" id="snooze" min="1" />
+    <label class="checkbox">
+      <input type="checkbox" id="sound" />
+      Play a sound when the reminder appears
     </label>
     <button id="save">Save</button>
     <p id="status"></p>
+
+    <hr />
+
+    <h2>Sync Account</h2>
+    <p id="auth-status"></p>
+
+    <div id="signed-out-block">
+      <label>
+        Email
+        <input type="email" id="auth-email" />
+      </label>
+      <label>
+        Password
+        <input type="password" id="auth-password" />
+      </label>
+      <button id="auth-sign-in">Sign in</button>
+      <button id="auth-sign-up">Create account</button>
+      <p id="auth-error"></p>
+    </div>
+
+    <div id="signed-in-block">
+      <button id="auth-sign-out">Sign out</button>
+    </div>
+
     <script src="main.js"></script>
   </body>
 </html>

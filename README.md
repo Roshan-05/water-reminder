@@ -32,9 +32,11 @@ npm run dist
 This produces a portable exe under `dist/`. Run it once manually — it will register
 itself to start on login. Verify under Task Manager → Startup apps.
 
-## Changing the sprite
+## Changing the character animation
 
-Animation frames and timings are defined in `assets/sprite/sprite.config.json`. Swap in
-new PNGs and update the file lists/timings there — no code changes needed for new frames
-of the same poses. The original uncropped/contact-sheet source images are kept in
-`assets/sprite/raw/` for reference.
+The popup character is drawn entirely with CSS/HTML — there are no image assets to
+swap in. Timing and distance are still configurable via
+`assets/sprite/sprite.config.json`: `displayHeightPx` sets the character's height,
+`walk.distancePx`/`walk.durationMs` control the walk-in/walk-out slide, `walk.haltOffsetFromRightPx`
+sets where the character stops, and `sip.durationMs` controls how long the drinking pose
+is held before the prompt appears.

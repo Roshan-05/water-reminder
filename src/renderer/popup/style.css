@@ -14,24 +14,34 @@ body {
   position: relative;
 }
 
-#sprite {
+#character {
   position: absolute;
-  bottom: 10px;
-  height: 150px;
+  bottom: 20px;
+  right: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+#character img {
+  height: 100%;
   width: auto;
   image-rendering: pixelated;
+  display: block;
 }
 
 #bubble {
   position: absolute;
-  bottom: 170px;
+  bottom: 215px;
   right: 20px;
   max-width: 220px;
-  background: #ffffff;
-  border: 2px solid #333333;
+  background: #20222b;
+  border: 1px solid #3a3d4a;
   border-radius: 12px;
   padding: 10px 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 300ms ease, transform 300ms ease;
@@ -47,12 +57,13 @@ body {
 #bubble p {
   margin: 0 0 8px 0;
   font-size: 13px;
-  color: #222222;
+  color: #e6e7eb;
 }
 
 #bubble-buttons {
   display: flex;
   gap: 8px;
+  margin-bottom: 8px;
 }
 
 #bubble-buttons button {
@@ -65,11 +76,29 @@ body {
 }
 
 #btn-yes {
-  background: #4caf50;
-  color: white;
+  background: #2f9e6b;
+  color: #eafff2;
 }
 
-#btn-snooze {
-  background: #e0e0e0;
-  color: #333333;
+#snooze-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#snooze-label {
+  font-size: 11px;
+  color: #9296a3;
+  margin-right: 2px;
+}
+
+.snooze-btn {
+  flex: 1;
+  padding: 5px 6px;
+  font-size: 11px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #343744;
+  color: #c7cad3;
 }

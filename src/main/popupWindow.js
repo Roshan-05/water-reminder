@@ -7,6 +7,8 @@ const WIN_H = 340;
 const MARGIN = 20;
 
 let currentWindow = null;
+let confettiWindow = null;
+let currentDisplayBounds = null;
 let handlersRegistered = false;
 
 function registerHandlers() {
@@ -23,10 +25,56 @@ function registerHandlers() {
     require('./scheduler').onDrank();
   });
 
-  ipcMain.on('popup:snooze', () => {
+  ipcMain.on('popup:snooze', (event, minutes) => {
     closeCurrent();
-    require('./scheduler').onSnooze();
+    require('./scheduler').onSnooze(minutes);
   });
+
+  ipcMain.on('popup:show-confetti', () => showConfetti());
+  ipcMain.on('popup:hide-confetti', () => hideConfetti());
+}
+
+function showConfetti() {
+  if (confettiWindow) return;
+
+  const bounds = currentDisplayBounds || screen.getPrimaryDisplay().bounds;
+
+  confettiWindow = new BrowserWindow({
+    x: bounds.x,
+    y: bounds.y,
+    width: bounds.width,
+    height: bounds.height,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    movable: false,
+    skipTaskbar: true,
+    focusable: false,
+    hasShadow: false,
+    show: false,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  confettiWindow.setIgnoreMouseEvents(true);
+  confettiWindow.setAlwaysOnTop(true, 'screen-saver');
+  confettiWindow.loadFile(path.join(__dirname, '..', 'renderer', 'confetti', 'index.html'));
+
+  confettiWindow.once('ready-to-show', () => {
+    if (confettiWindow && !confettiWindow.isDestroyed()) {
+      confettiWindow.showInactive();
+    }
+  });
+}
+
+function hideConfetti() {
+  if (confettiWindow && !confettiWindow.isDestroyed()) {
+    confettiWindow.destroy();
+  }
+  confettiWindow = null;
 }
 
 function closeCurrent() {
@@ -34,13 +82,16 @@ function closeCurrent() {
     currentWindow.destroy();
   }
   currentWindow = null;
+  hideConfetti();
 }
 
 function showReminder() {
   registerHandlers();
   closeCurrent();
 
-  const { workArea } = screen.getPrimaryDisplay();
+  const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+  const { workArea } = display;
+  currentDisplayBounds = display.bounds;
   const x = workArea.x + workArea.width - WIN_W - MARGIN;
   const y = workArea.y + workArea.height - WIN_H - MARGIN;
 
@@ -73,6 +124,12 @@ function showReminder() {
       currentWindow.showInactive();
     }
   });
+
+  if (process.env.WR_TEST_AUTOFIRE) {
+    currentWindow.webContents.on('console-message', (event, level, message) => {
+      console.log('[renderer]', message);
+    });
+  }
 }
 
 module.exports = { showReminder };

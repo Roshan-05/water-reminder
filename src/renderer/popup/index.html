@@ -2,18 +2,28 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <img id="sprite" src="" alt="" />
+    <div id="character">
+      <img id="sprite-img" alt="" />
+    </div>
     <div id="bubble">
-      <p>Did you drink water?</p>
+      <p id="bubble-text">Did you drink water?</p>
       <div id="bubble-buttons">
         <button id="btn-yes">Yes, I drank!</button>
-        <button id="btn-snooze">Snooze</button>
+      </div>
+      <div id="snooze-row">
+        <span id="snooze-label">Snooze</span>
+        <button class="snooze-btn" data-minutes="5">5m</button>
+        <button class="snooze-btn" data-minutes="10">10m</button>
+        <button class="snooze-btn" data-minutes="15">15m</button>
       </div>
     </div>
-    <script src="SpriteAnimator.js"></script>
-    <script src="main.js"></script>
+    <script src="main.js" type="module"></script>
   </body>
 </html>

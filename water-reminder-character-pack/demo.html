@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Water Reminder Character Demo</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(#eef7ff, #f8fbff);
+    font-family: system-ui, sans-serif;
+  }
+  .stage {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+  }
+  .character {
+    position: absolute;
+    width: 150px;
+    height: 260px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    pointer-events: none;
+    will-change: left;
+  }
+  .card {
+    position: absolute;
+    right: 32px;
+    bottom: 32px;
+    width: 300px;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.96);
+    box-shadow: 0 12px 35px rgba(0,0,0,.18);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: .25s ease;
+  }
+  .card.show { opacity: 1; transform: translateY(0); }
+  .card h3 { margin: 0 0 7px; }
+  .card p { margin: 0 0 14px; color: #56606b; }
+  .buttons { display:flex; gap:8px; }
+  button {
+    flex:1;
+    border:0;
+    border-radius:10px;
+    padding:10px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  #drank { background:#0d8cff; color:white; }
+  #snooze { background:#e9eef3; color:#222; }
+  .hint {
+    position: absolute; left: 20px; top: 20px;
+    padding: 10px 13px; border-radius: 10px;
+    background: rgba(255,255,255,.8);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="hint">Water reminder animation demo — reload to replay</div>
+  <img id="character" class="character" alt="">
+  <div id="card" class="card">
+    <h3>💧 Time to hydrate</h3>
+    <p>Did you drink some water?</p>
+    <div class="buttons">
+      <button id="drank">I drank 💧</button>
+      <button id="snooze">Snooze ⏰</button>
+    </div>
+  </div>
+</div>
+<script>
+const img = document.getElementById('character');
+const card = document.getElementById('card');
+
+const frames = {
+  walkLeft: ['assets/walk-left/01.png','assets/walk-left/02.png','assets/walk-left/03.png'],
+  walkRight: ['assets/walk-right/01.png','assets/walk-right/02.png','assets/walk-right/03.png'],
+  hold: 'assets/hold/01.png',
+  drink: ['assets/drink/01.png','assets/drink/02.png'],
+  idle: 'assets/idle/01.png'
+};
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const setFrame = src => img.src = src;
+
+async function walk(direction, distancePx) {
+  const sequence = direction === 'left'
+    ? [0,1,2,1,0,1,2,1]
+    : [0,1,2,1,0,1,2,1];
+
+  const start = parseFloat(getComputedStyle(img).left);
+  const end = start + (direction === 'left' ? -distancePx : distancePx);
+  const step = (end - start) / sequence.length;
+
+  for (let i = 0; i < sequence.length; i++) {
+    setFrame(frames[direction === 'left' ? 'walkLeft' : 'walkRight'][sequence[i]]);
+    img.style.left = `${start + step*(i+1)}px`;
+    await sleep(115);
+  }
+}
+
+async function run() {
+  card.classList.remove('show');
+  img.style.display = 'block';
+
+  // Enter from the right.
+  img.style.left = `${innerWidth + 20}px`;
+  img.style.top = `${innerHeight - 290}px`;
+
+  // Walk left into the screen.
+  await walk('left', Math.min(430, innerWidth * .32));
+
+  // Stop.
+  setFrame(frames.hold);
+  await sleep(350);
+
+  // Drink.
+  setFrame(frames.drink[0]);
+  await sleep(280);
+  setFrame(frames.drink[1]);
+  await sleep(850);
+  setFrame(frames.drink[0]);
+  await sleep(280);
+
+  // Idle while notification appears.
+  setFrame(frames.idle);
+  await sleep(250);
+  card.classList.add('show');
+}
+
+async function leave() {
+  card.classList.remove('show');
+  await sleep(250);
+  await walk('right', Math.min(430, innerWidth * .32) + 220);
+  img.style.display = 'none';
+}
+
+document.getElementById('drank').onclick = leave;
+document.getElementById('snooze').onclick = leave;
+window.addEventListener('resize', () => { if (img.style.display !== 'none') img.style.top = `${innerHeight - 290}px`; });
+
+run();
+</script>
+</body>
+</html>

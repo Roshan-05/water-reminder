@@ -6,14 +6,18 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "test:smoke": "node scripts/smoke-test.js",
+    "build-sprites": "node scripts/extract-sprite-sheet.js"
   },
   "dependencies": {
-    "electron-store": "^8.2.0"
+    "electron-store": "^8.2.0",
+    "firebase": "^12.18.0"
   },
   "devDependencies": {
     "electron": "^31.0.0",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "jimp": "^1.6.1"
   },
   "build": {
     "appId": "com.roshankumarsah.water-reminder",

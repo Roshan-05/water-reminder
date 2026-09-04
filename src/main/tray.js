@@ -7,30 +7,35 @@ const settingsStore = require('./settingsStore');
 let tray = null;
 
 function buildMenu() {
-  const { paused } = settingsStore.get();
-  return Menu.buildFromTemplate([
-    { label: 'Drink water now', click: () => scheduler.fireNow() },
-    {
-      label: paused ? 'Resume' : 'Pause',
-      click: () => {
-        if (paused) {
-          scheduler.resume();
-        } else {
-          scheduler.pause();
-        }
-        refresh();
-      },
-    },
-    { label: 'Settings...', click: () => settingsWindow.open() },
-    { type: 'separator' },
-    { label: 'Quit', click: () => app.quit() },
-  ]);
+  const { paused, pausedUntil } = settingsStore.get();
+  const items = [{ label: 'Drink water now', click: () => scheduler.fireNow() }];
+
+  if (paused) {
+    items.push({ label: 'Resume', click: () => { scheduler.resume(); refresh(); } });
+  } else if (pausedUntil) {
+    items.push({ label: 'Resume now', click: () => { scheduler.resumeFromPauseForToday(); refresh(); } });
+  } else {
+    items.push({ label: 'Pause', click: () => { scheduler.pause(); refresh(); } });
+    items.push({ label: 'Pause for today', click: () => { scheduler.pauseForToday(); refresh(); } });
+  }
+
+  items.push({ label: 'Settings...', click: () => settingsWindow.open() });
+  items.push({ type: 'separator' });
+  items.push({ label: 'Quit', click: () => app.quit() });
+
+  return Menu.buildFromTemplate(items);
 }
 
 function refresh() {
-  const { paused } = settingsStore.get();
+  const { paused, pausedUntil, todayCount } = settingsStore.get();
   tray.setContextMenu(buildMenu());
-  tray.setToolTip(paused ? 'Water Reminder (paused)' : 'Water Reminder');
+
+  let label = 'Water Reminder';
+  if (paused) label += ' (paused)';
+  else if (pausedUntil) label += ' (paused for today)';
+  label += ` — ${todayCount || 0} today`;
+
+  tray.setToolTip(label);
 }
 
 function create() {
@@ -40,4 +45,4 @@ function create() {
   refresh();
 }
 
-module.exports = { create };
+module.exports = { create, refresh };

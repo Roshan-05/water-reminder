@@ -15,12 +15,25 @@ label {
   font-size: 13px;
 }
 
+label.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 input {
   display: block;
   width: 100%;
   margin-top: 4px;
   padding: 6px;
   box-sizing: border-box;
+}
+
+label.checkbox input {
+  display: inline;
+  width: auto;
+  margin-top: 0;
+  padding: 0;
 }
 
 button {
@@ -36,4 +49,26 @@ button {
   font-size: 12px;
   color: #4caf50;
   height: 16px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #dddddd;
+  margin: 16px 0;
+}
+
+#auth-status {
+  font-size: 12px;
+  color: #555555;
+}
+
+#auth-error {
+  font-size: 12px;
+  color: #c0392b;
+  min-height: 16px;
+}
+
+#signed-out-block button,
+#signed-in-block button {
+  margin-right: 8px;
 }

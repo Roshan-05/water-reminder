@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Water Reminder</string>
+    <string name="title_activity_main">Water Reminder</string>
+    <string name="package_name">com.roshankumarsah.waterreminder</string>
+    <string name="custom_url_scheme">com.roshankumarsah.waterreminder</string>
+</resources>

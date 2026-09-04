@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Water Reminder — Sign in</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 24px;
+      }
+      h2 {
+        text-align: center;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 320px;
+        margin: 0 auto;
+      }
+      input {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #cccccc;
+      }
+      button {
+        padding: 14px 20px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        background: #4caf50;
+        color: white;
+      }
+      #toggle-mode {
+        background: none;
+        color: #4caf50;
+        padding: 4px;
+      }
+      #error {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #c62828;
+        text-align: center;
+        min-height: 1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <h2 id="heading">Sign in</h2>
+    <form id="auth-form">
+      <input type="email" id="email" placeholder="Email" autocomplete="email" required />
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password" required />
+      <button type="submit" id="submit-btn">Sign in</button>
+      <button type="button" id="toggle-mode">Need an account? Create one</button>
+    </form>
+    <p id="error"></p>
+    <script src="js/auth.js" type="module"></script>
+  </body>
+</html>
