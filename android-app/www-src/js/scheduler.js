@@ -3,6 +3,7 @@ import { registerPlugin } from '@capacitor/core';
 import { pushUserState } from './dataLayer.js';
 
 const FullScreenReminder = registerPlugin('FullScreenReminder');
+const OverlayReminder = registerPlugin('OverlayReminder');
 
 const REMINDER_ID = 1;
 const CHANNEL_ID = 'water-reminder';
@@ -47,18 +48,22 @@ async function requestPermissions() {
 
 async function scheduleAt(atDate) {
   await ensureChannel();
-  await LocalNotifications.cancel({ notifications: [{ id: REMINDER_ID }] });
-  await LocalNotifications.schedule({
-    notifications: [
-      {
-        id: REMINDER_ID,
-        title: 'Water Reminder',
-        body: 'Time for a water break!',
-        channelId: CHANNEL_ID,
-        schedule: { at: atDate, allowWhileIdle: true },
-      },
-    ],
-  });
+  try {
+    await LocalNotifications.cancel({ notifications: [{ id: REMINDER_ID }] });
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: REMINDER_ID,
+          title: 'Water Reminder',
+          body: 'Time for a water break!',
+          channelId: CHANNEL_ID,
+          schedule: { at: atDate, allowWhileIdle: true },
+        },
+      ],
+    });
+  } catch (err) {
+    console.error('[scheduler] LocalNotifications.schedule failed:', err);
+  }
   try {
     await FullScreenReminder.schedule({ atMillis: String(atDate.getTime()) });
   } catch (err) {
@@ -68,7 +73,11 @@ async function scheduleAt(atDate) {
 }
 
 async function cancelReminder() {
-  await LocalNotifications.cancel({ notifications: [{ id: REMINDER_ID }] });
+  try {
+    await LocalNotifications.cancel({ notifications: [{ id: REMINDER_ID }] });
+  } catch (err) {
+    console.error('[scheduler] LocalNotifications.cancel failed:', err);
+  }
   try {
     await FullScreenReminder.cancel();
   } catch (err) {
@@ -92,6 +101,34 @@ async function openFullScreenIntentSettings() {
     await FullScreenReminder.openFullScreenIntentSettings();
   } catch (err) {
     console.error('[scheduler] openFullScreenIntentSettings failed:', err);
+  }
+}
+
+async function canDrawOverlays() {
+  try {
+    const { allowed } = await OverlayReminder.canDrawOverlays();
+    return allowed;
+  } catch (err) {
+    console.error('[scheduler] canDrawOverlays failed:', err);
+    return false;
+  }
+}
+
+async function requestOverlayPermission() {
+  try {
+    await OverlayReminder.requestOverlayPermission();
+  } catch (err) {
+    console.error('[scheduler] requestOverlayPermission failed:', err);
+  }
+}
+
+async function showOverlayNow() {
+  try {
+    await OverlayReminder.showNow();
+    return true;
+  } catch (err) {
+    console.error('[scheduler] showOverlayNow failed:', err);
+    return false;
   }
 }
 
@@ -139,4 +176,7 @@ export {
   cancelReminder,
   canUseFullScreenIntent,
   openFullScreenIntentSettings,
+  canDrawOverlays,
+  requestOverlayPermission,
+  showOverlayNow,
 };

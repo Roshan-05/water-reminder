@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(FullScreenReminderPlugin.class);
+        registerPlugin(OverlayReminderPlugin.class);
         super.onCreate(savedInstanceState);
         applyShowOverLockscreen(getIntent());
     }

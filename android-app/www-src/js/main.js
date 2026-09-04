@@ -1,7 +1,14 @@
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { App } from '@capacitor/app';
 import { observeAuthState, ensureUserDoc, subscribeToUserState, pushUserState } from './dataLayer.js';
-import { requestPermissions, armFromStoredState, computeAndPushNextFireAt, cancelReminder } from './scheduler.js';
+import {
+  requestPermissions,
+  armFromStoredState,
+  computeAndPushNextFireAt,
+  cancelReminder,
+  canDrawOverlays,
+  showOverlayNow,
+} from './scheduler.js';
 
 LocalNotifications.addListener('localNotificationActionPerformed', () => {
   window.location.href = 'reminder.html';
@@ -72,8 +79,13 @@ App.addListener('appStateChange', ({ isActive }) => {
   }
 });
 
-drinkBtn.addEventListener('click', () => {
+drinkBtn.addEventListener('click', async () => {
   if (!uid || !state) return;
+  const allowed = await canDrawOverlays();
+  if (allowed) {
+    const shown = await showOverlayNow();
+    if (shown) return;
+  }
   window.location.href = 'reminder.html';
 });
 

@@ -8,8 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
+import android.provider.Settings;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 public class FullScreenAlarmReceiver extends BroadcastReceiver {
 
@@ -18,6 +21,18 @@ public class FullScreenAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent receivedIntent) {
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        boolean screenOn = powerManager != null && powerManager.isInteractive();
+
+        if (screenOn && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(context)) {
+            ContextCompat.startForegroundService(context, new Intent(context, OverlayReminderService.class));
+            return;
+        }
+
+        showFullScreenNotification(context);
+    }
+
+    private void showFullScreenNotification(Context context) {
         ensureChannel(context);
 
         Intent contentIntent = new Intent(context, MainActivity.class);

@@ -21,6 +21,7 @@ esbuild.buildSync({
     path.join(srcDir, 'js', 'auth.js'),
     path.join(srcDir, 'js', 'reminderScreen.js'),
     path.join(srcDir, 'js', 'settings.js'),
+    path.join(srcDir, 'js', 'overlay.js'),
   ],
   outdir: path.join(outDir, 'js'),
   bundle: true,

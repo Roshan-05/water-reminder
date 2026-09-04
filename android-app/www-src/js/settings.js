@@ -1,5 +1,11 @@
 import { observeAuthState, signOut, subscribeToUserState, pushUserState } from './dataLayer.js';
-import { computeAndPushNextFireAt, canUseFullScreenIntent, openFullScreenIntentSettings } from './scheduler.js';
+import {
+  computeAndPushNextFireAt,
+  canUseFullScreenIntent,
+  openFullScreenIntentSettings,
+  canDrawOverlays,
+  requestOverlayPermission,
+} from './scheduler.js';
 
 const intervalInput = document.getElementById('interval');
 const soundInput = document.getElementById('sound');
@@ -9,6 +15,8 @@ const signoutBtn = document.getElementById('signout-btn');
 const backBtn = document.getElementById('back-btn');
 const fullscreenWarning = document.getElementById('fullscreen-warning');
 const fullscreenSettingsBtn = document.getElementById('fullscreen-settings-btn');
+const overlayWarning = document.getElementById('overlay-warning');
+const overlaySettingsBtn = document.getElementById('overlay-settings-btn');
 
 canUseFullScreenIntent().then((allowed) => {
   fullscreenWarning.style.display = allowed ? 'none' : 'block';
@@ -16,6 +24,14 @@ canUseFullScreenIntent().then((allowed) => {
 
 fullscreenSettingsBtn.addEventListener('click', () => {
   openFullScreenIntentSettings();
+});
+
+canDrawOverlays().then((allowed) => {
+  overlayWarning.style.display = allowed ? 'none' : 'block';
+});
+
+overlaySettingsBtn.addEventListener('click', () => {
+  requestOverlayPermission();
 });
 
 let uid = null;
