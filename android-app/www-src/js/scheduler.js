@@ -68,6 +68,13 @@ async function rescheduleIn(minutes) {
   await scheduleAt(new Date(Date.now() + minutes * 60000));
 }
 
+async function computeAndPushNextFireAt(uid, minutes) {
+  const nextFireAt = Date.now() + minutes * 60000;
+  await pushUserState(uid, { nextFireAt });
+  await scheduleAt(new Date(nextFireAt));
+  return nextFireAt;
+}
+
 async function armFromStoredState(uid, state) {
   if (recentlyScheduled()) return;
 
@@ -85,7 +92,18 @@ async function armFromStoredState(uid, state) {
     await pushUserState(uid, { pausedUntil: null });
   }
 
-  await rescheduleIn(state.intervalMinutes);
+  if (state.nextFireAt) {
+    await scheduleAt(new Date(state.nextFireAt));
+  } else {
+    await computeAndPushNextFireAt(uid, state.intervalMinutes);
+  }
 }
 
-export { requestPermissions, armFromStoredState, rescheduleIn, cancelReminder };
+export {
+  requestPermissions,
+  armFromStoredState,
+  rescheduleIn,
+  scheduleAt,
+  computeAndPushNextFireAt,
+  cancelReminder,
+};

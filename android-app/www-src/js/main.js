@@ -1,7 +1,7 @@
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { App } from '@capacitor/app';
-import { observeAuthState, signOut, ensureUserDoc, subscribeToUserState, pushUserState } from './dataLayer.js';
-import { requestPermissions, armFromStoredState, rescheduleIn } from './scheduler.js';
+import { observeAuthState, ensureUserDoc, subscribeToUserState, pushUserState } from './dataLayer.js';
+import { requestPermissions, armFromStoredState, computeAndPushNextFireAt, cancelReminder } from './scheduler.js';
 
 LocalNotifications.addListener('localNotificationActionPerformed', () => {
   window.location.href = 'reminder.html';
@@ -11,7 +11,7 @@ const countEl = document.getElementById('count');
 const statusEl = document.getElementById('status');
 const drinkBtn = document.getElementById('drink-btn');
 const pauseBtn = document.getElementById('pause-btn');
-const signoutBtn = document.getElementById('signout-btn');
+const settingsBtn = document.getElementById('settings-btn');
 
 let uid = null;
 let state = null;
@@ -68,30 +68,27 @@ App.addListener('appStateChange', ({ isActive }) => {
 
 drinkBtn.addEventListener('click', () => {
   if (!uid || !state) return;
-  const key = todayKey();
-  const isNewDay = state.todayDate !== key;
-  const payload = isNewDay
-    ? { todayDate: key, todayCount: 1 }
-    : { todayDate: key, todayCountDelta: 1 };
-  state = { ...state, todayDate: key, todayCount: isNewDay ? 1 : (state.todayCount || 0) + 1 };
-  render();
-  pushUserState(uid, payload).catch((err) => {
-    statusEl.textContent = `Sync failed: ${err.message}`;
-  });
-  rescheduleIn(state.intervalMinutes).catch((err) => console.error('[scheduler] reschedule failed:', err));
+  window.location.href = 'reminder.html';
 });
 
-pauseBtn.addEventListener('click', () => {
+pauseBtn.addEventListener('click', async () => {
   if (!uid || !state) return;
   const paused = !state.paused;
   state = { ...state, paused };
   render();
-  pushUserState(uid, { paused }).catch((err) => {
+  try {
+    if (paused) {
+      await pushUserState(uid, { paused, nextFireAt: null });
+      await cancelReminder();
+    } else {
+      await pushUserState(uid, { paused });
+      await computeAndPushNextFireAt(uid, state.intervalMinutes);
+    }
+  } catch (err) {
     statusEl.textContent = `Sync failed: ${err.message}`;
-  });
+  }
 });
 
-signoutBtn.addEventListener('click', async () => {
-  if (unsubscribeState) unsubscribeState();
-  await signOut();
+settingsBtn.addEventListener('click', () => {
+  window.location.href = 'settings.html';
 });

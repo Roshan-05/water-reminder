@@ -20,6 +20,7 @@ esbuild.buildSync({
     path.join(srcDir, 'js', 'main.js'),
     path.join(srcDir, 'js', 'auth.js'),
     path.join(srcDir, 'js', 'reminderScreen.js'),
+    path.join(srcDir, 'js', 'settings.js'),
   ],
   outdir: path.join(outDir, 'js'),
   bundle: true,

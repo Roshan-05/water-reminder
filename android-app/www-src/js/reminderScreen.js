@@ -1,5 +1,5 @@
 import { observeAuthState, subscribeToUserState, pushUserState } from './dataLayer.js';
-import { rescheduleIn } from './scheduler.js';
+import { scheduleAt, computeAndPushNextFireAt } from './scheduler.js';
 import { createReminderController } from '../../../src/shared/reminderAnimation.js';
 import { playChime } from '../../../src/shared/chime.js';
 
@@ -31,16 +31,18 @@ observeAuthState(async (user) => {
     onDrank: async () => {
       const key = todayKey();
       const isNewDay = !state || state.todayDate !== key;
-      const payload = isNewDay
-        ? { todayDate: key, todayCount: 1 }
-        : { todayDate: key, todayCountDelta: 1 };
       const intervalMinutes = state ? state.intervalMinutes : 30;
-      await Promise.all([pushUserState(uid, payload), rescheduleIn(intervalMinutes)]);
+      const nextFireAt = Date.now() + intervalMinutes * 60000;
+      const payload = isNewDay
+        ? { todayDate: key, todayCount: 1, nextFireAt }
+        : { todayDate: key, todayCountDelta: 1, nextFireAt };
+      await pushUserState(uid, payload);
+      await scheduleAt(new Date(nextFireAt));
       unsubscribe();
       window.location.href = 'index.html';
     },
     onSnooze: async (minutes) => {
-      await rescheduleIn(minutes);
+      await computeAndPushNextFireAt(uid, minutes);
       unsubscribe();
       window.location.href = 'index.html';
     },

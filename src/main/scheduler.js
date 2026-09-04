@@ -5,6 +5,7 @@ const IDLE_THRESHOLD_SEC = 120;
 const IDLE_POLL_MS = 15000;
 
 let activeTimer = null;
+let lastLocalScheduleAt = 0;
 
 function getPopupWindow() {
   return require('./popupWindow');
@@ -28,6 +29,17 @@ function todayMidnightEnd() {
 function scheduleNext(ms) {
   clearTimeout(activeTimer);
   activeTimer = setTimeout(fire, ms);
+}
+
+function armAt(nextFireAt) {
+  lastLocalScheduleAt = Date.now();
+  scheduleNext(Math.max(0, nextFireAt - Date.now()));
+}
+
+function scheduleInMinutes(minutes) {
+  const nextFireAt = Date.now() + minutes * 60000;
+  settingsStore.set({ nextFireAt });
+  armAt(nextFireAt);
 }
 
 function fire() {
@@ -60,31 +72,31 @@ function recordDrink() {
 function onDrank() {
   recordDrink();
   const { intervalMinutes } = settingsStore.get();
-  scheduleNext(intervalMinutes * 60000);
+  scheduleInMinutes(intervalMinutes);
   getTray().refresh();
 }
 
 function onSnooze(minutesOverride) {
   const { snoozeMinutes } = settingsStore.get();
   const minutes = minutesOverride || snoozeMinutes;
-  scheduleNext(minutes * 60000);
+  scheduleInMinutes(minutes);
 }
 
 function pause() {
   clearTimeout(activeTimer);
-  settingsStore.set({ paused: true, pausedUntil: null });
+  settingsStore.set({ paused: true, pausedUntil: null, nextFireAt: null });
 }
 
 function resume() {
-  settingsStore.set({ paused: false });
   const { intervalMinutes } = settingsStore.get();
-  scheduleNext(intervalMinutes * 60000);
+  settingsStore.set({ paused: false });
+  scheduleInMinutes(intervalMinutes);
 }
 
 function pauseForToday() {
   clearTimeout(activeTimer);
   const target = todayMidnightEnd();
-  settingsStore.set({ pausedUntil: target.toISOString() });
+  settingsStore.set({ pausedUntil: target.toISOString(), nextFireAt: null });
   activeTimer = setTimeout(resumeFromPauseForToday, target.getTime() - Date.now());
 }
 
@@ -92,12 +104,13 @@ function resumeFromPauseForToday() {
   clearTimeout(activeTimer);
   settingsStore.set({ pausedUntil: null });
   const { intervalMinutes } = settingsStore.get();
-  scheduleNext(intervalMinutes * 60000);
+  scheduleInMinutes(intervalMinutes);
 }
 
 function armFromStoredState() {
-  const { paused, pausedUntil, intervalMinutes } = settingsStore.get();
+  const { paused, pausedUntil, intervalMinutes, nextFireAt } = settingsStore.get();
   if (paused) return;
+  if (Date.now() - lastLocalScheduleAt < 5000) return;
 
   if (pausedUntil) {
     const remainingMs = new Date(pausedUntil).getTime() - Date.now();
@@ -109,7 +122,11 @@ function armFromStoredState() {
     settingsStore.set({ pausedUntil: null });
   }
 
-  scheduleNext(intervalMinutes * 60000);
+  if (nextFireAt) {
+    armAt(nextFireAt);
+  } else {
+    scheduleInMinutes(intervalMinutes);
+  }
 }
 
 function start() {

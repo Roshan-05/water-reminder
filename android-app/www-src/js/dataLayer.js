@@ -7,7 +7,9 @@ import {
   signOut as firebaseSignOut,
 } from 'firebase/auth';
 import {
-  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
   doc,
   getDoc,
   setDoc,
@@ -29,7 +31,9 @@ const DEFAULT_STATE = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentSingleTabManager({}) }),
+});
 
 function observeAuthState(cb) {
   return onAuthStateChanged(auth, cb);

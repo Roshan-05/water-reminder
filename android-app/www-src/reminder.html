@@ -11,7 +11,7 @@
         padding: 0;
         width: 100%;
         height: 100%;
-        background: #14161c;
+        background: rgba(10, 11, 15, 0.75);
         overflow: hidden;
         font-family: 'Segoe UI', sans-serif;
       }
@@ -30,6 +30,7 @@
         opacity: 0;
         pointer-events: none;
         transition: opacity 200ms ease;
+        z-index: 2;
       }
 
       #confetti.active {
@@ -38,6 +39,19 @@
 
       #confetti::before {
         content: '🎉💧🎉';
+      }
+
+      #stage {
+        position: absolute;
+        top: 8vh;
+        bottom: 8vh;
+        left: 50%;
+        width: 100%;
+        max-width: 340px;
+        transform: translateX(-50%);
+        background: #20222b;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       }
 
       #character {
@@ -133,19 +147,21 @@
   </head>
   <body>
     <div id="confetti"></div>
-    <div id="character">
-      <img id="sprite-img" alt="" />
-    </div>
-    <div id="bubble">
-      <p id="bubble-text">Did you drink water?</p>
-      <div id="bubble-buttons">
-        <button id="btn-yes">Yes, I drank!</button>
+    <div id="stage">
+      <div id="character">
+        <img id="sprite-img" alt="" />
       </div>
-      <div id="snooze-row">
-        <span id="snooze-label">Snooze</span>
-        <button class="snooze-btn" data-minutes="5">5m</button>
-        <button class="snooze-btn" data-minutes="10">10m</button>
-        <button class="snooze-btn" data-minutes="15">15m</button>
+      <div id="bubble">
+        <p id="bubble-text">Did you drink water?</p>
+        <div id="bubble-buttons">
+          <button id="btn-yes">Yes, I drank!</button>
+        </div>
+        <div id="snooze-row">
+          <span id="snooze-label">Snooze</span>
+          <button class="snooze-btn" data-minutes="5">5m</button>
+          <button class="snooze-btn" data-minutes="10">10m</button>
+          <button class="snooze-btn" data-minutes="15">15m</button>
+        </div>
       </div>
     </div>
     <script src="js/reminderScreen.js" type="module"></script>

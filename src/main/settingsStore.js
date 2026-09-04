@@ -10,6 +10,7 @@ const store = new Store({
     soundEnabled: true,
     todayDate: '',
     todayCount: 0,
+    nextFireAt: null,
   },
 });
 
@@ -33,6 +34,7 @@ function get() {
     soundEnabled: store.get('soundEnabled'),
     todayDate: store.get('todayDate'),
     todayCount: store.get('todayCount'),
+    nextFireAt: store.get('nextFireAt'),
   };
 }
 
