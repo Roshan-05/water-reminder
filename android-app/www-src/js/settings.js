@@ -1,5 +1,5 @@
 import { observeAuthState, signOut, subscribeToUserState, pushUserState } from './dataLayer.js';
-import { computeAndPushNextFireAt } from './scheduler.js';
+import { computeAndPushNextFireAt, canUseFullScreenIntent, openFullScreenIntentSettings } from './scheduler.js';
 
 const intervalInput = document.getElementById('interval');
 const soundInput = document.getElementById('sound');
@@ -7,6 +7,16 @@ const status = document.getElementById('status');
 const saveBtn = document.getElementById('save');
 const signoutBtn = document.getElementById('signout-btn');
 const backBtn = document.getElementById('back-btn');
+const fullscreenWarning = document.getElementById('fullscreen-warning');
+const fullscreenSettingsBtn = document.getElementById('fullscreen-settings-btn');
+
+canUseFullScreenIntent().then((allowed) => {
+  fullscreenWarning.style.display = allowed ? 'none' : 'block';
+});
+
+fullscreenSettingsBtn.addEventListener('click', () => {
+  openFullScreenIntentSettings();
+});
 
 let uid = null;
 let state = null;

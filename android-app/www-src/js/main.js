@@ -7,6 +7,12 @@ LocalNotifications.addListener('localNotificationActionPerformed', () => {
   window.location.href = 'reminder.html';
 });
 
+App.addListener('appUrlOpen', ({ url }) => {
+  if (url && url.startsWith('waterreminder://reminder')) {
+    window.location.href = 'reminder.html';
+  }
+});
+
 const countEl = document.getElementById('count');
 const statusEl = document.getElementById('status');
 const drinkBtn = document.getElementById('drink-btn');

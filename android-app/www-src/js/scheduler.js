@@ -1,5 +1,8 @@
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { registerPlugin } from '@capacitor/core';
 import { pushUserState } from './dataLayer.js';
+
+const FullScreenReminder = registerPlugin('FullScreenReminder');
 
 const REMINDER_ID = 1;
 const CHANNEL_ID = 'water-reminder';
@@ -56,12 +59,40 @@ async function scheduleAt(atDate) {
       },
     ],
   });
+  try {
+    await FullScreenReminder.schedule({ atMillis: String(atDate.getTime()) });
+  } catch (err) {
+    console.error('[scheduler] FullScreenReminder.schedule failed:', err);
+  }
   markScheduled();
 }
 
 async function cancelReminder() {
   await LocalNotifications.cancel({ notifications: [{ id: REMINDER_ID }] });
+  try {
+    await FullScreenReminder.cancel();
+  } catch (err) {
+    console.error('[scheduler] FullScreenReminder.cancel failed:', err);
+  }
   markScheduled();
+}
+
+async function canUseFullScreenIntent() {
+  try {
+    const { allowed } = await FullScreenReminder.canUseFullScreenIntent();
+    return allowed;
+  } catch (err) {
+    console.error('[scheduler] canUseFullScreenIntent failed:', err);
+    return true;
+  }
+}
+
+async function openFullScreenIntentSettings() {
+  try {
+    await FullScreenReminder.openFullScreenIntentSettings();
+  } catch (err) {
+    console.error('[scheduler] openFullScreenIntentSettings failed:', err);
+  }
 }
 
 async function rescheduleIn(minutes) {
@@ -106,4 +137,6 @@ export {
   scheduleAt,
   computeAndPushNextFireAt,
   cancelReminder,
+  canUseFullScreenIntent,
+  openFullScreenIntentSettings,
 };
